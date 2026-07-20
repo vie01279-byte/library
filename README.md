@@ -10,19 +10,20 @@ https://vie01279-byte.github.io/library/
 
 ---
 
-## Categories
+## Categories (Tổng cộng: 7)
 
-### 📖 Books
+### 📖 Books (5)
 
 - Nghệ thuật sống cùng xác suất
-- Loss Adjuster Handbook
-- AI for Loss Adjusters
+- 50 Ý Tưởng Cho Một File HTML
+- Commanding AI · Ra Lệnh Cho AI
+- Hướng dẫn Claude Cowork & Claude Code
+- Workshop — AI as Tool
 
-### 🧰 Web Apps
+### 🧰 Web Apps (2)
 
-- Trader Journal
-- Reserve Calculator
-- BOQ Builder
+- BÁT TỰ v2
+- Trợ lý soạn hợp đồng
 
 ---
 

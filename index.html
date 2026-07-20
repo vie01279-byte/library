@@ -402,6 +402,16 @@
                 const response = await fetch('data/library.json');
                 if (!response.ok) throw new Error('Network response was not ok');
                 libraryData = await response.json();
+                
+                // Update filter counts automatically
+                const total = libraryData.length;
+                const booksCount = libraryData.filter(item => item.type === 'book').length;
+                const appsCount = libraryData.filter(item => item.type === 'app').length;
+                
+                document.querySelector('[data-filter="all"]').textContent = `All Items (${total})`;
+                document.querySelector('[data-filter="book"]').textContent = `Books (${booksCount})`;
+                document.querySelector('[data-filter="app"]').textContent = `Apps (${appsCount})`;
+
                 renderLibrary();
             } catch (error) {
                 console.error('Error fetching library data:', error);
