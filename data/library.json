@@ -1,0 +1,54 @@
+[
+  {
+    "title": "Nghệ thuật sống cùng xác suất",
+    "author": "Vie Tran",
+    "version": "1.0",
+    "updated": "2026-07-20",
+    "language": "vi",
+    "category": "Trading",
+    "type": "book",
+    "tags": ["Trading", "Psychology", "Probability"],
+    "cover": "assets/covers/default-book.png",
+    "url": "books/nghe-thuat-song-cung-xac-suat.html",
+    "description": "Triết lý Prop Trading và áp dụng xác suất vào đời sống."
+  },
+  {
+    "title": "Trader Journal",
+    "author": "Vie Tran",
+    "version": "2.1",
+    "updated": "2026-07-21",
+    "language": "vi",
+    "category": "Tools",
+    "type": "app",
+    "tags": ["Trading", "Journal", "Tool"],
+    "cover": "assets/covers/default-app.png",
+    "url": "apps/trader-journal.html",
+    "description": "Nhật ký giao dịch thông minh cho Trader."
+  },
+  {
+    "title": "Loss Adjuster Handbook",
+    "author": "Indochine Survey",
+    "version": "1.5",
+    "updated": "2026-07-15",
+    "language": "en",
+    "category": "Insurance",
+    "type": "book",
+    "tags": ["Insurance", "Loss Adjuster", "Manual"],
+    "cover": "assets/covers/default-book.png",
+    "url": "books/loss-adjuster-handbook.html",
+    "description": "Cẩm nang nghiệp vụ giám định bồi thường bảo hiểm."
+  },
+  {
+    "title": "Reserve Estimator",
+    "author": "Indochine Survey",
+    "version": "1.0",
+    "updated": "2026-07-18",
+    "language": "vi",
+    "category": "Insurance",
+    "type": "app",
+    "tags": ["Insurance", "Calculator", "Finance"],
+    "cover": "assets/covers/default-app.png",
+    "url": "apps/reserve-estimator.html",
+    "description": "Công cụ tính toán dự phòng tổn thất nhanh."
+  }
+]
