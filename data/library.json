@@ -89,5 +89,31 @@
     "cover": "assets/covers/default-book.png",
     "url": "books/workshop-ai-as-tool.html",
     "description": "Bilingual Coaching Guide for using AI as a tool."
+  },
+  {
+    "title": "Làm CEO của Đội Ngũ AI",
+    "author": "tdhoang89",
+    "version": "1.0",
+    "updated": "2026-07-20",
+    "language": "vi",
+    "category": "Technology",
+    "type": "book",
+    "tags": ["AI", "Management", "Leadership"],
+    "cover": "assets/covers/default-book.png",
+    "url": "books/lam-ceo-cua-doi-ngu-ai.html",
+    "description": "Kỹ năng quản trị và điều phối đội ngũ AI."
+  },
+  {
+    "title": "Viết Cho Người · Writing for Humans",
+    "author": "tdhoang89",
+    "version": "1.0",
+    "updated": "2026-07-20",
+    "language": "vi",
+    "category": "Writing",
+    "type": "book",
+    "tags": ["Writing", "Communication", "Content"],
+    "cover": "assets/covers/default-book.png",
+    "url": "books/viet-cho-nguoi-writing-for-humans.html",
+    "description": "Cẩm nang kỹ năng viết hướng tới độc giả con người."
   }
 ]

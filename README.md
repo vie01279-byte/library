@@ -10,15 +10,17 @@ https://vie01279-byte.github.io/library/
 
 ---
 
-## Categories (Tổng cộng: 7)
+## Categories (Tổng cộng: 9)
 
-### 📖 Books (5)
+### 📖 Books (7)
 
 - Nghệ thuật sống cùng xác suất
 - 50 Ý Tưởng Cho Một File HTML
 - Commanding AI · Ra Lệnh Cho AI
 - Hướng dẫn Claude Cowork & Claude Code
 - Workshop — AI as Tool
+- Làm CEO của Đội Ngũ AI
+- Viết Cho Người · Writing for Humans
 
 ### 🧰 Web Apps (2)
 
