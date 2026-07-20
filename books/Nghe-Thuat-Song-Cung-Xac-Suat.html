@@ -322,6 +322,7 @@ body.focus .canvas{max-width:760px}
   .wordmark span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .wordmark small{display:none}
   .ibtn.search span, .ibtn.search kbd{display:none}
+  #focusBtn{display:none}
   .lens{margin:0 auto 0 6px}
 }
 @media(max-width:760px){
@@ -329,7 +330,6 @@ body.focus .canvas{max-width:760px}
   .canvas{padding:26px 18px 90px}
   .lens button{padding:5px 9px;font-size:12px}
   .ibtn.search span{display:none}
-  .fsize{display:none}
   .wordmark span:not(small){font-size:15px}
   .opener-grid{grid-template-columns:1fr;gap:2px}
   .opener-no{font-size:3.2rem}
@@ -340,8 +340,10 @@ body.focus .canvas{max-width:760px}
 </style><noscript><style>section.doc[hidden]{display:block!important}#progress{display:none}</style></noscript>
 <style>
 .doc-body p { text-align: justify; hyphens: auto; word-break: break-word; overflow-wrap: break-word; }
-body.focus { --maxw: 80vw !important; }
-body.focus .canvas, body.focus .doc-body, body.focus .hero { max-width: 80vw !important; width: 100% !important; }
+@media(min-width:1081px) {
+  body.focus { --maxw: 80vw !important; }
+  body.focus .canvas, body.focus .doc-body, body.focus .hero { max-width: 80vw !important; width: 100% !important; }
+}
 /* Pager styling */
 .pager { display: flex; justify-content: space-between; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--gray-3); }
 .pager a { display: inline-flex; align-items: center; text-decoration: none; color: var(--ink); font-weight: 500; font-size: 1.1rem; transition: color 0.2s; cursor: pointer; }
@@ -618,6 +620,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 if(selectedIdx >= 0) items[selectedIdx].click();
             } else if(e.key === 'Escape') {
                 e.preventDefault();
+                palette.close();
+            }
+        });
+    }
+    
+    if (palette) {
+        palette.addEventListener('click', (e) => {
+            const rect = palette.getBoundingClientRect();
+            if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
                 palette.close();
             }
         });
