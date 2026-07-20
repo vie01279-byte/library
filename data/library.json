@@ -50,5 +50,83 @@
     "cover": "assets/covers/default-app.png",
     "url": "apps/reserve-estimator.html",
     "description": "Công cụ tính toán dự phòng tổn thất nhanh."
+  },
+  {
+    "title": "50 Ý Tưởng Cho Một File HTML",
+    "author": "Vie Tran",
+    "version": "1.0",
+    "updated": "2026-07-20",
+    "language": "vi",
+    "category": "Technology",
+    "type": "book",
+    "tags": ["HTML", "Web", "Course"],
+    "cover": "assets/covers/default-book.png",
+    "url": "books/50-y-tuong-cho-mot-file-html.html",
+    "description": "Khóa học song ngữ về 50 ý tưởng xây dựng ứng dụng HTML."
+  },
+  {
+    "title": "BÁT TỰ v2",
+    "author": "Vie Tran",
+    "version": "2.0",
+    "updated": "2026-07-20",
+    "language": "vi",
+    "category": "Astrology",
+    "type": "app",
+    "tags": ["Bazi", "Tool", "Astrology"],
+    "cover": "assets/covers/default-app.png",
+    "url": "apps/bat-tu-v2.html",
+    "description": "Sách tra lá số bát tự tương tác."
+  },
+  {
+    "title": "Commanding AI · Ra Lệnh Cho AI",
+    "author": "Vie Tran",
+    "version": "1.0",
+    "updated": "2026-07-20",
+    "language": "vi",
+    "category": "Technology",
+    "type": "book",
+    "tags": ["AI", "Prompt Engineering"],
+    "cover": "assets/covers/default-book.png",
+    "url": "books/commanding-ai.html",
+    "description": "Hướng dẫn cách ra lệnh và làm việc với AI hiệu quả."
+  },
+  {
+    "title": "Hướng dẫn Claude Cowork & Claude Code",
+    "author": "Vie Tran",
+    "version": "1.0",
+    "updated": "2026-07-20",
+    "language": "vi",
+    "category": "Technology",
+    "type": "book",
+    "tags": ["AI", "Claude", "Workspace"],
+    "cover": "assets/covers/default-book.png",
+    "url": "books/huong-dan-claude-cowork.html",
+    "description": "Tài liệu hướng dẫn sử dụng Claude trong Workspace."
+  },
+  {
+    "title": "Trợ lý soạn hợp đồng",
+    "author": "Vie Tran",
+    "version": "1.0",
+    "updated": "2026-07-20",
+    "language": "vi",
+    "category": "Tools",
+    "type": "app",
+    "tags": ["Legal", "Contract", "Tool"],
+    "cover": "assets/covers/default-app.png",
+    "url": "apps/tro-ly-soan-hop-dong.html",
+    "description": "Công cụ hỗ trợ tự động soạn thảo hợp đồng."
+  },
+  {
+    "title": "Workshop — AI as Tool",
+    "author": "Vie Tran",
+    "version": "1.0",
+    "updated": "2026-07-20",
+    "language": "en",
+    "category": "Technology",
+    "type": "book",
+    "tags": ["AI", "Workshop", "Bilingual"],
+    "cover": "assets/covers/default-book.png",
+    "url": "books/workshop-ai-as-tool.html",
+    "description": "Bilingual Coaching Guide for using AI as a tool."
   }
 ]
