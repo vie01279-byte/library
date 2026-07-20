@@ -318,7 +318,10 @@ body.focus .canvas{max-width:760px}
     transition:transform .24s var(--ease);background:var(--bg);box-shadow:var(--shadow-l)}
   .spine.open{transform:none}
   .backdrop.show{display:block;position:fixed;inset:var(--tbar) 0 0;background:color-mix(in srgb,var(--ink) 34%,transparent);z-index:54}
+  .wordmark{min-width:0;overflow:hidden}
+  .wordmark span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .wordmark small{display:none}
+  .ibtn.search span, .ibtn.search kbd{display:none}
   .lens{margin:0 auto 0 6px}
 }
 @media(max-width:760px){
