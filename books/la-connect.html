@@ -216,6 +216,8 @@
     }
     .toc-title { font-size: 13.5px; line-height: 1.35; }
 
+    .sidebar { transition: transform .22s ease; }
+    .sidebar-backdrop { display: none; position: fixed; inset: var(--topbar) 0 0; z-index: 70; border: 0; background: rgba(15,28,24,.38); }
     .main {
       grid-column: 2;
       min-width: 0;
@@ -453,6 +455,8 @@
         transform: translateX(-105%);
         box-shadow: 20px 0 40px rgba(20,35,30,.18);
       }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop.open { display: block; }
       .main { width: 100%; }
       .book-hero {
         min-height: auto;
@@ -537,6 +541,7 @@
         </div>
       </div>
     </aside>
+    <button class="sidebar-backdrop" type="button" aria-label="Đóng mục lục"></button>
 
     <main class="main" id="noi-dung">
       <section class="book-hero" id="bia" aria-labelledby="book-title">
@@ -579,6 +584,18 @@
       const numberNode = document.getElementById('chapter-number');
       const titleNode = document.getElementById('chapter-title');
       const contentNode = document.getElementById('chapter-content');
+      const sidebar = document.querySelector('.sidebar');
+      const menuButton = document.querySelector('.menu-button');
+      const backdrop = document.querySelector('.sidebar-backdrop');
+      const closeMenu = () => { sidebar.classList.remove('open'); backdrop.classList.remove('open'); menuButton.setAttribute('aria-expanded', 'false'); };
+      menuButton.setAttribute('aria-expanded', 'false');
+      menuButton.addEventListener('click', () => {
+        const opening = !sidebar.classList.contains('open');
+        sidebar.classList.toggle('open', opening);
+        backdrop.classList.toggle('open', opening);
+        menuButton.setAttribute('aria-expanded', String(opening));
+      });
+      backdrop.addEventListener('click', closeMenu);
 
       const inline = (value) => value
         .replace(/`([^`]+)`/g, '<code>$1</code>')
@@ -649,6 +666,7 @@
       links.forEach(link => link.addEventListener('click', event => {
         event.preventDefault();
         showChapter(link.getAttribute('href').slice(1));
+        closeMenu();
       }));
       showChapter('chuong-1', false);
     })();
