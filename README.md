@@ -14,7 +14,7 @@ https://vie01279-byte.github.io/library/
 
 ### 📖 Books (8)
 
-- LA-CONNECT — Bản khung thử nghiệm
+- LA-CONNECT — Bản đọc thử nghiệm
 - Nghệ thuật sống cùng xác suất
 - 50 Ý Tưởng Cho Một File HTML
 - Commanding AI · Ra Lệnh Cho AI

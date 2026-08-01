@@ -1,16 +1,16 @@
 [
   {
-    "title": "LA-CONNECT — Bản khung thử nghiệm",
+    "title": "LA-CONNECT — Bản đọc thử nghiệm",
     "author": "Vie Tran",
-    "version": "1-khung",
+    "version": "2-loi",
     "updated": "2026-08-01",
     "language": "vi",
     "category": "Agentic AI",
     "type": "book",
     "tags": ["Agentic AI", "Loss Adjusting", "Human-centered Systems"],
     "cover": "assets/covers/default-book.png",
-    "url": "books/la-connect-v1-khung.html",
-    "description": "Bản thử nghiệm giao diện và trải nghiệm đọc trên thiết bị di động của LA-CONNECT."
+    "url": "books/la-connect.html",
+    "description": "Bản đọc tương tác của LA-CONNECT với sáu chương đã duyệt."
   },
   {
     "title": "Nghệ thuật sống cùng xác suất",
