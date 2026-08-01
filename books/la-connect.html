@@ -399,7 +399,9 @@
       gap: 14px;
     }
     .pager-card {
-      opacity: .58;
+      cursor: pointer;
+      color: inherit;
+      text-align: left;
       min-width: 0;
       min-height: 94px;
       padding: 18px 20px;
@@ -408,6 +410,8 @@
       background: rgba(255,255,255,.55);
     }
     .pager-card.next { text-align: right; }
+    .pager-card:disabled { cursor: default; opacity: .42; }
+    .pager-card:not(:disabled):hover { border-color: rgba(183,101,62,.34); background: rgba(255,255,255,.82); }
     .pager-dir {
       display: block;
       margin-bottom: 5px;
@@ -568,9 +572,9 @@
           <p class="chapter-lead">Bản thảo đã được Vie duyệt, hiển thị nguyên vẹn trong trình đọc tương tác.</p>
         </header>
         <div class="prose" id="chapter-content"></div>
-        <nav class="pager" aria-label="Điều hướng chương — sẽ hoạt động ở bước CỐT LÕI tiếp theo">
-          <div class="pager-card"><span class="pager-dir">Trang trước</span><span class="pager-title">Sẽ kích hoạt sau</span></div>
-          <div class="pager-card next"><span class="pager-dir">Chương tiếp theo</span><span class="pager-title">Sẽ kích hoạt sau</span></div>
+        <nav class="pager" aria-label="Điều hướng chương">
+          <button class="pager-card" id="previous-chapter" type="button"><span class="pager-dir">Chương trước</span><span class="pager-title"></span></button>
+          <button class="pager-card next" id="next-chapter" type="button"><span class="pager-dir">Chương tiếp theo</span><span class="pager-title"></span></button>
         </nav>
       </article>
     </main>
@@ -584,6 +588,8 @@
       const numberNode = document.getElementById('chapter-number');
       const titleNode = document.getElementById('chapter-title');
       const contentNode = document.getElementById('chapter-content');
+      const previousButton = document.getElementById('previous-chapter');
+      const nextButton = document.getElementById('next-chapter');
       const sidebar = document.querySelector('.sidebar');
       const menuButton = document.querySelector('.menu-button');
       const backdrop = document.querySelector('.sidebar-backdrop');
@@ -648,8 +654,9 @@
         return blocks.join('\n');
       }
 
-      function showChapter(slug, shouldScroll = true) {
+      function showChapter(slug, shouldScroll = true, updateHash = true) {
         const chapter = chapters.find(item => item.slug === slug) || chapters[0];
+        const chapterIndex = chapters.indexOf(chapter);
         numberNode.textContent = `Chương ${chapter.number} · ${chapter.part}`;
         titleNode.textContent = chapter.title;
         contentNode.innerHTML = markdownToHtml(chapter.markdown);
@@ -660,6 +667,13 @@
           else link.removeAttribute('aria-current');
         });
         document.title = `${chapter.title} — LA-CONNECT`;
+        previousButton.disabled = chapterIndex === 0;
+        previousButton.querySelector('.pager-title').textContent = chapterIndex === 0 ? 'Đầu sách' : chapters[chapterIndex - 1].title;
+        nextButton.disabled = chapterIndex === chapters.length - 1;
+        nextButton.querySelector('.pager-title').textContent = chapterIndex === chapters.length - 1 ? 'Hết phần hiện có' : chapters[chapterIndex + 1].title;
+        previousButton.dataset.target = chapterIndex > 0 ? chapters[chapterIndex - 1].slug : '';
+        nextButton.dataset.target = chapterIndex < chapters.length - 1 ? chapters[chapterIndex + 1].slug : '';
+        if (updateHash && location.hash !== `#${chapter.slug}`) history.pushState({ chapter: chapter.slug }, '', `#${chapter.slug}`);
         if (shouldScroll) document.getElementById('chapter-reader').scrollIntoView({ behavior: 'smooth' });
       }
 
@@ -668,7 +682,16 @@
         showChapter(link.getAttribute('href').slice(1));
         closeMenu();
       }));
-      showChapter('chuong-1', false);
+      [previousButton, nextButton].forEach(button => button.addEventListener('click', () => {
+        if (button.dataset.target) showChapter(button.dataset.target);
+      }));
+      window.addEventListener('hashchange', () => {
+        const slug = location.hash.slice(1);
+        if (chapters.some(chapter => chapter.slug === slug)) showChapter(slug, true, false);
+      });
+      const initialSlug = chapters.some(chapter => `#${chapter.slug}` === location.hash) ? location.hash.slice(1) : 'chuong-1';
+      showChapter(initialSlug, false, false);
+      if (!location.hash) history.replaceState({ chapter: initialSlug }, '', `#${initialSlug}`);
     })();
   </script>
 </body>
