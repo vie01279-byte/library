@@ -242,6 +242,9 @@
     .sidebar { transition: transform .22s ease; }
     .sidebar-backdrop { display: none; position: fixed; inset: var(--topbar) 0 0; z-index: 70; border: 0; background: rgba(15,28,24,.38); }
     .tool-search { cursor: pointer; }
+    .font-tools { display:flex; gap:5px; }
+    .font-tools .tool { cursor:pointer; }
+    .tool:disabled { cursor:default; opacity:.38; }
     .search-modal[hidden] { display: none; }
     .search-modal { position: fixed; inset: 0; z-index: 120; display: grid; align-items: start; justify-items: center; padding: max(84px,12vh) 18px 30px; background: rgba(15,28,24,.52); }
     .search-panel { width: min(680px,100%); max-height: min(680px,78vh); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 17px; background: var(--surface-solid); box-shadow: 0 28px 80px rgba(12,28,23,.30); }
@@ -511,8 +514,8 @@
 
     @media (max-width: 520px) {
       .brand-text { max-width: 128px; font-size: 14px; }
-      .tool-size { display:inline-flex; min-width:44px; padding:0 9px; }
-      .tool-size .size-value { display:none; }
+      .font-tools { display:flex; }
+      .font-tools .tool { min-width:44px; padding:0 8px; }
       .book-hero { padding-left: 18px; padding-right: 18px; }
       .hero-title { letter-spacing: -.065em; }
       .hero-declaration { padding: 18px; }
@@ -537,7 +540,7 @@
     </a>
     <div class="toolset" aria-label="Công cụ đọc">
       <button class="tool tool-search" type="button" aria-label="Tìm kiếm"><span>⌕</span><span class="tool-label">Tìm</span></button>
-      <button class="tool tool-size" type="button" aria-label="Thay đổi cỡ chữ"><span aria-hidden="true">A</span><span class="size-value" aria-hidden="true">18</span></button>
+      <div class="font-tools" role="group" aria-label="Điều chỉnh cỡ chữ"><button class="tool tool-font-down" type="button" aria-label="Giảm cỡ chữ">A−</button><button class="tool tool-font-up" type="button" aria-label="Tăng cỡ chữ">A+</button></div>
       <button class="tool tool-focus" type="button" aria-label="Chế độ đọc tập trung" aria-pressed="false">◫</button>
       <button class="tool tool-theme" type="button" aria-label="Sáng tối" aria-pressed="false">◐</button>
     </div>
@@ -649,7 +652,8 @@
       const searchClose = document.getElementById('search-close');
       const previousButton = document.getElementById('previous-chapter');
       const nextButton = document.getElementById('next-chapter');
-      const sizeButton = document.querySelector('.tool-size');
+      const fontDownButton = document.querySelector('.tool-font-down');
+      const fontUpButton = document.querySelector('.tool-font-up');
       const focusButton = document.querySelector('.tool-focus');
       const themeButton = document.querySelector('.tool-theme');
       const exportButton = document.getElementById('export-settings');
@@ -697,8 +701,11 @@
         document.body.classList.toggle('focus-mode', Boolean(readerState.focus));
         themeButton.setAttribute('aria-pressed', String(readerState.theme === 'dark'));
         focusButton.setAttribute('aria-pressed', String(Boolean(readerState.focus)));
-        sizeButton.querySelector('.size-value').textContent = readerState.fontSize;
-        sizeButton.setAttribute('title', `Cỡ chữ ${readerState.fontSize}px`);
+        const fontIndex = FONT_SIZES.indexOf(Number(readerState.fontSize));
+        fontDownButton.disabled = fontIndex <= 0;
+        fontUpButton.disabled = fontIndex >= FONT_SIZES.length - 1;
+        fontDownButton.setAttribute('title', `Giảm cỡ chữ · hiện tại ${readerState.fontSize}px`);
+        fontUpButton.setAttribute('title', `Tăng cỡ chữ · hiện tại ${readerState.fontSize}px`);
       }
 
       const inline = (value) => value
@@ -877,7 +884,8 @@
       window.addEventListener('scroll', scheduleProgressUpdate, { passive: true });
       window.addEventListener('resize', scheduleProgressUpdate);
       themeButton.addEventListener('click', () => { readerState.theme = readerState.theme === 'dark' ? 'light' : 'dark'; applySettings(); saveSettings(); });
-      sizeButton.addEventListener('click', () => { const current = FONT_SIZES.indexOf(Number(readerState.fontSize)); readerState.fontSize = FONT_SIZES[(current + 1) % FONT_SIZES.length]; applySettings(); saveSettings(); scheduleProgressUpdate(); });
+      fontDownButton.addEventListener('click', () => { const current = FONT_SIZES.indexOf(Number(readerState.fontSize)); if (current > 0) readerState.fontSize = FONT_SIZES[current - 1]; applySettings(); saveSettings(); scheduleProgressUpdate(); });
+      fontUpButton.addEventListener('click', () => { const current = FONT_SIZES.indexOf(Number(readerState.fontSize)); if (current < FONT_SIZES.length - 1) readerState.fontSize = FONT_SIZES[current + 1]; applySettings(); saveSettings(); scheduleProgressUpdate(); });
       focusButton.addEventListener('click', () => { readerState.focus = !readerState.focus; applySettings(); saveSettings(); scheduleProgressUpdate(); });
       exportButton.addEventListener('click', () => {
         const json = JSON.stringify({ app: 'LA-CONNECT', version: 1, settings: readerState }, null, 2);
