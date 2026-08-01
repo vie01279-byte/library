@@ -643,6 +643,10 @@
       const plain = (value) => value.replace(/[`*_<>]/g, '').trim();
       const normalize = (value) => plain(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
       const slugify = (value) => normalize(value).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const matchesNeedle = (value, needle) => {
+        const normalized = normalize(value);
+        return /^[a-z0-9]{1,3}$/.test(needle) ? normalized.split(/[^a-z0-9]+/).includes(needle) : normalized.includes(needle);
+      };
 
       let progressScheduled = false;
       function updateReadingProgress() {
@@ -739,14 +743,22 @@
         });
         return [chapterItem, ...headings];
       });
+      function contentResult(chapter, needle) {
+        const block = chapter.markdown.split(/\n\s*\n/).find(part => matchesNeedle(part, needle));
+        if (!block) return null;
+        const excerpt = plain(block.replace(/^#+\s*/gm, '').replace(/^[-]>?\s*/gm, '').replace(/\s+/g, ' '));
+        return { kind: 'Nội dung', title: excerpt.length > 180 ? `${excerpt.slice(0, 177)}…` : excerpt, chapter, headingId: '', query: needle };
+      }
       function renderSearch(query) {
         const needle = normalize(query);
-        const matches = needle ? searchIndex.filter(item => normalize(`${item.title} ${item.chapter.title}`).includes(needle)).slice(0, 30) : [];
+        const structuralMatches = needle ? searchIndex.filter(item => matchesNeedle(`${item.title} ${item.chapter.title}`, needle)) : [];
+        const contentMatches = needle ? chapters.map(chapter => contentResult(chapter, needle)).filter(Boolean) : [];
+        const matches = [...structuralMatches, ...contentMatches].slice(0, 30);
         searchResults.replaceChildren();
         if (!matches.length) {
           const empty = document.createElement('p');
           empty.className = 'search-empty';
-          empty.textContent = needle ? 'Không tìm thấy chương hoặc đề mục phù hợp.' : 'Nhập từ khóa để tìm trong tên chương và các đề mục.';
+          empty.textContent = needle ? 'Không tìm thấy nội dung phù hợp.' : 'Nhập từ khóa để tìm trong toàn bộ nội dung sách.';
           searchResults.appendChild(empty);
           return;
         }
@@ -756,6 +768,7 @@
           button.className = 'search-result';
           button.dataset.chapter = item.chapter.slug;
           button.dataset.heading = item.headingId;
+          button.dataset.query = item.query || '';
           const kind = document.createElement('span');
           kind.className = 'search-kind';
           kind.textContent = item.kind;
@@ -804,7 +817,8 @@
         showChapter(result.dataset.chapter, false);
         closeSearch();
         requestAnimationFrame(() => requestAnimationFrame(() => {
-          const target = result.dataset.heading ? document.getElementById(result.dataset.heading) : readerNode;
+          const fullTextTarget = result.dataset.query ? [...contentNode.querySelectorAll('h2,p,li,blockquote')].find(node => matchesNeedle(node.textContent, result.dataset.query)) : null;
+          const target = result.dataset.heading ? document.getElementById(result.dataset.heading) : (fullTextTarget || readerNode);
           target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }));
       });
