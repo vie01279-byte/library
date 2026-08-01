@@ -83,8 +83,9 @@
     .reading-progress {
       position: fixed;
       inset: 0 auto auto 0;
-      width: 34%;
+      width: 0%;
       height: 3px;
+      transition: width .12s linear;
       background: linear-gradient(90deg, var(--copper), var(--signal));
       z-index: 90;
     }
@@ -488,7 +489,7 @@
 </head>
 <body>
   <a class="skip-link" href="#noi-dung">Nhảy tới nội dung</a>
-  <div class="reading-progress" aria-hidden="true"></div>
+  <div class="reading-progress" id="reading-progress" role="progressbar" aria-label="Tiến trình đọc chương" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
 
   <header class="topbar">
     <button class="tool menu-button" type="button" aria-label="Danh mục">☰</button>
@@ -588,6 +589,8 @@
       const numberNode = document.getElementById('chapter-number');
       const titleNode = document.getElementById('chapter-title');
       const contentNode = document.getElementById('chapter-content');
+      const progressNode = document.getElementById('reading-progress');
+      const readerNode = document.getElementById('chapter-reader');
       const previousButton = document.getElementById('previous-chapter');
       const nextButton = document.getElementById('next-chapter');
       const sidebar = document.querySelector('.sidebar');
@@ -607,6 +610,23 @@
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
         .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+
+      let progressScheduled = false;
+      function updateReadingProgress() {
+        const start = readerNode.offsetTop;
+        const end = Math.max(start + 1, start + readerNode.offsetHeight - window.innerHeight);
+        const ratio = Math.min(1, Math.max(0, (window.scrollY - start) / (end - start)));
+        const percent = Math.round(ratio * 100);
+        progressNode.style.width = `${percent}%`;
+        progressNode.setAttribute('aria-valuenow', String(percent));
+        progressScheduled = false;
+      }
+      function scheduleProgressUpdate() {
+        if (!progressScheduled) {
+          progressScheduled = true;
+          requestAnimationFrame(updateReadingProgress);
+        }
+      }
 
       function markdownToHtml(markdown) {
         const lines = markdown.replace(/\r/g, '').split('\n');
@@ -675,6 +695,7 @@
         nextButton.dataset.target = chapterIndex < chapters.length - 1 ? chapters[chapterIndex + 1].slug : '';
         if (updateHash && location.hash !== `#${chapter.slug}`) history.pushState({ chapter: chapter.slug }, '', `#${chapter.slug}`);
         if (shouldScroll) document.getElementById('chapter-reader').scrollIntoView({ behavior: 'smooth' });
+        requestAnimationFrame(updateReadingProgress);
       }
 
       links.forEach(link => link.addEventListener('click', event => {
@@ -689,6 +710,8 @@
         const slug = location.hash.slice(1);
         if (chapters.some(chapter => chapter.slug === slug)) showChapter(slug, true, false);
       });
+      window.addEventListener('scroll', scheduleProgressUpdate, { passive: true });
+      window.addEventListener('resize', scheduleProgressUpdate);
       const initialSlug = chapters.some(chapter => `#${chapter.slug}` === location.hash) ? location.hash.slice(1) : 'chuong-1';
       showChapter(initialSlug, false, false);
       if (!location.hash) history.replaceState({ chapter: initialSlug }, '', `#${initialSlug}`);
