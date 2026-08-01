@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+  <meta name="description" content="LA-CONNECT - Khởi nguồn cùng AI. Hành trình một Loss Adjuster học cách xây những hệ thống phục vụ con người.">
+  <title>LA-CONNECT — Khởi nguồn cùng AI</title>
+  <style>
+    :root {
+      --paper: #f4f0e7;
+      --paper-deep: #e8e0d1;
+      --surface: rgba(255,255,255,.72);
+      --surface-solid: #fbfaf6;
+      --ink: #192421;
+      --ink-soft: #4c5b56;
+      --muted: #75817c;
+      --line: rgba(26,60,51,.14);
+      --forest: #193f35;
+      --forest-2: #2c6556;
+      --copper: #b7653e;
+      --copper-soft: #efd6c6;
+      --signal: #e5b34f;
+      --blueprint: #dce8e5;
+      --shadow: 0 18px 50px rgba(33,47,42,.10);
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, monospace;
+      --topbar: 64px;
+      --sidebar: 300px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 78% 8%, rgba(229,179,79,.11), transparent 28rem),
+        linear-gradient(135deg, var(--paper) 0%, #f8f5ed 54%, var(--paper) 100%);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.68;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .16;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+      z-index: 100;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    code {
+      font-family: var(--mono);
+      font-size: .87em;
+      padding: .12em .38em;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(25,63,53,.06);
+      overflow-wrap: anywhere;
+    }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: -60px;
+      z-index: 200;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--forest);
+      color: white;
+    }
+    .skip-link:focus { top: 12px; }
+
+    .reading-progress {
+      position: fixed;
+      inset: 0 auto auto 0;
+      width: 34%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--copper), var(--signal));
+      z-index: 90;
+    }
+
+    .topbar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: var(--topbar);
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: max(0px, env(safe-area-inset-top)) 22px 0;
+      border-bottom: 1px solid var(--line);
+      background: rgba(247,244,236,.86);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: auto;
+      font-weight: 750;
+      letter-spacing: -.02em;
+      color: var(--forest);
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 8px 8px 8px 2px;
+      color: white;
+      background: linear-gradient(145deg, var(--forest), var(--forest-2));
+      box-shadow: 0 7px 18px rgba(25,63,53,.20);
+      font-size: 13px;
+    }
+    .brand-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand-text small {
+      color: var(--muted);
+      font-weight: 550;
+    }
+
+    .toolset { display: flex; align-items: center; gap: 7px; }
+    .tool {
+      min-width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--surface-solid);
+      color: var(--ink-soft);
+      box-shadow: 0 4px 14px rgba(33,47,42,.05);
+      cursor: default;
+    }
+    .tool-label { font-size: 13px; }
+    .menu-button { display: none; }
+
+    .layout {
+      min-height: 100vh;
+      padding-top: var(--topbar);
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0,1fr);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: var(--topbar);
+      bottom: 0;
+      left: 0;
+      width: var(--sidebar);
+      overflow-y: auto;
+      padding: 26px 18px 40px;
+      border-right: 1px solid var(--line);
+      background: rgba(246,242,233,.70);
+    }
+
+    .toc-eyebrow {
+      margin: 0 10px 16px;
+      color: var(--copper);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .toc-group { margin: 0 0 22px; }
+    .toc-group-title {
+      margin: 0 10px 8px;
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .toc-link {
+      display: grid;
+      grid-template-columns: 28px minmax(0,1fr);
+      gap: 9px;
+      align-items: start;
+      margin: 3px 0;
+      padding: 10px 11px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      color: var(--ink-soft);
+    }
+    .toc-link.active {
+      border-color: rgba(183,101,62,.16);
+      background: linear-gradient(90deg, rgba(183,101,62,.12), rgba(255,255,255,.55));
+      color: var(--forest);
+      box-shadow: 0 8px 20px rgba(55,48,40,.05);
+    }
+    .toc-no {
+      color: var(--copper);
+      font-family: var(--serif);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .toc-title { font-size: 13.5px; line-height: 1.35; }
+
+    .main {
+      grid-column: 2;
+      min-width: 0;
+    }
+
+    .book-hero {
+      min-height: calc(100vh - var(--topbar));
+      display: grid;
+      align-items: center;
+      padding: 70px clamp(30px,7vw,110px);
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-inner { max-width: 920px; margin: 0 auto; }
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--copper);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .hero-kicker::before {
+      content: "";
+      width: 34px;
+      height: 1px;
+      background: currentColor;
+    }
+    .hero-title {
+      max-width: 850px;
+      margin: 26px 0 18px;
+      font-family: var(--serif);
+      font-size: clamp(3.1rem,7.4vw,6.8rem);
+      font-weight: 600;
+      letter-spacing: -.055em;
+      line-height: .92;
+      color: var(--forest);
+    }
+    .hero-title span { color: var(--copper); }
+    .hero-subtitle {
+      max-width: 720px;
+      margin: 0 0 28px;
+      color: var(--ink-soft);
+      font-family: var(--serif);
+      font-size: clamp(1.15rem,2.2vw,1.55rem);
+      font-style: italic;
+    }
+    .hero-declaration {
+      max-width: 760px;
+      margin-top: 38px;
+      padding: 22px 24px;
+      border-left: 4px solid var(--signal);
+      border-radius: 0 14px 14px 0;
+      background: rgba(255,255,255,.54);
+      color: var(--forest);
+      box-shadow: var(--shadow);
+      font-weight: 650;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 32px;
+    }
+    .meta-pill {
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.52);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .reader-stage {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 90px clamp(24px,6vw,90px) 120px;
+    }
+    .chapter-opener {
+      position: relative;
+      padding: 0 0 38px;
+      border-bottom: 1px solid var(--line);
+    }
+    .chapter-number {
+      color: var(--copper);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .chapter-title {
+      max-width: 840px;
+      margin: 14px 0 14px;
+      font-family: var(--serif);
+      font-size: clamp(2.4rem,5.5vw,4.8rem);
+      font-weight: 600;
+      letter-spacing: -.035em;
+      line-height: 1.02;
+      color: var(--forest);
+    }
+    .chapter-lead {
+      max-width: 720px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .prose {
+      max-width: 760px;
+      margin: 50px auto 0;
+      font-family: var(--serif);
+      font-size: 1.08rem;
+    }
+    .prose p { margin: 0 0 1.35em; }
+    .prose h2 {
+      margin: 2.4em 0 .8em;
+      color: var(--forest);
+      font-family: var(--sans);
+      font-size: 1.35rem;
+      letter-spacing: -.02em;
+    }
+    .prose blockquote {
+      margin: 2.1em 0;
+      padding: 4px 0 4px 24px;
+      border-left: 3px solid var(--copper);
+      color: var(--forest);
+      font-size: 1.16em;
+      font-style: italic;
+    }
+    .prose mark {
+      margin: 0 -.08em;
+      padding: .02em .12em;
+      color: inherit;
+      background: linear-gradient(transparent 45%, rgba(229,179,79,.46) 45% 92%, transparent 92%);
+    }
+
+    .callout {
+      margin: 2.2em 0;
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface);
+      box-shadow: 0 12px 32px rgba(33,47,42,.07);
+      font-family: var(--sans);
+      font-size: .95rem;
+    }
+    .callout-label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 10px;
+      color: var(--copper);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .callout-label::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 0 5px rgba(229,179,79,.18);
+    }
+    .callout-human {
+      border-color: rgba(44,101,86,.22);
+      background: linear-gradient(135deg, rgba(220,232,229,.78), rgba(255,255,255,.62));
+    }
+    .callout-human .callout-label { color: var(--forest-2); }
+
+    .pager {
+      max-width: 880px;
+      margin: 75px auto 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .pager-card {
+      min-width: 0;
+      min-height: 94px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.55);
+    }
+    .pager-card.next { text-align: right; }
+    .pager-dir {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .pager-title {
+      color: var(--forest);
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 650;
+      overflow-wrap: anywhere;
+    }
+
+    .frame-note {
+      max-width: 760px;
+      margin: 52px auto 0;
+      padding: 14px 16px;
+      border: 1px dashed rgba(183,101,62,.35);
+      border-radius: 10px;
+      color: var(--muted);
+      background: rgba(239,214,198,.22);
+      font-family: var(--sans);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      :root { --topbar: 58px; }
+      .menu-button { display: inline-flex; }
+      .tool-search .tool-label, .tool-focus { display: none; }
+      .topbar { padding-left: 10px; padding-right: 10px; gap: 7px; }
+      .brand { gap: 7px; }
+      .brand-text small { display: none; }
+      .toolset { gap: 5px; }
+      .tool { min-width: 44px; height: 44px; padding: 0 10px; }
+
+      .layout { display: block; }
+      .sidebar {
+        z-index: 75;
+        width: min(84vw,320px);
+        transform: translateX(-105%);
+        box-shadow: 20px 0 40px rgba(20,35,30,.18);
+      }
+      .main { width: 100%; }
+      .book-hero {
+        min-height: auto;
+        padding: 78px 24px 76px;
+      }
+      .hero-title { font-size: clamp(3.2rem,16vw,5.2rem); }
+      .reader-stage { padding: 64px 20px 90px; }
+      .chapter-title { font-size: clamp(2.5rem,12vw,4.2rem); }
+      .prose { font-size: 1.03rem; }
+    }
+
+    @media (max-width: 520px) {
+      .brand-text { max-width: 128px; font-size: 14px; }
+      .tool-size { display: none; }
+      .book-hero { padding-left: 18px; padding-right: 18px; }
+      .hero-title { letter-spacing: -.065em; }
+      .hero-declaration { padding: 18px; }
+      .reader-stage { padding-left: 18px; padding-right: 18px; }
+      .prose blockquote { padding-left: 17px; }
+      .callout { padding: 19px 18px; }
+      .pager { grid-template-columns: 1fr; }
+      .pager-card.next { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#noi-dung">Nhảy tới nội dung</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <button class="tool menu-button" type="button" aria-label="Danh mục">☰</button>
+    <a class="brand" href="#bia" aria-label="LA-CONNECT - Trang bìa">
+      <span class="brand-mark">LA</span>
+      <span class="brand-text">LA-CONNECT <small>· Khởi nguồn cùng AI</small></span>
+    </a>
+    <div class="toolset" aria-label="Công cụ đọc">
+      <button class="tool tool-search" type="button" aria-label="Tìm kiếm"><span>⌕</span><span class="tool-label">Tìm</span></button>
+      <button class="tool tool-size" type="button" aria-label="Cỡ chữ">A−&nbsp; A+</button>
+      <button class="tool tool-focus" type="button" aria-label="Chế độ đọc tập trung">◫</button>
+      <button class="tool" type="button" aria-label="Sáng tối">◐</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Mục lục sách">
+      <p class="toc-eyebrow">Bản đọc · Phần mở đầu</p>
+
+      <div class="toc-group">
+        <p class="toc-group-title">Khởi nguồn</p>
+        <a class="toc-link active" href="#chuong-1">
+          <span class="toc-no">01</span><span class="toc-title">Hôm qua còn chạy tốt</span>
+        </a>
+        <a class="toc-link" href="#chuong-2">
+          <span class="toc-no">02</span><span class="toc-title">Với AI Agent, chỉ SKILL thì không đủ</span>
+        </a>
+      </div>
+
+      <div class="toc-group">
+        <p class="toc-group-title">Trách nhiệm</p>
+        <a class="toc-link" href="#chuong-3">
+          <span class="toc-no">03</span><span class="toc-title">Tìm ra lỗi chỉ là phần dễ nhất</span>
+        </a>
+        <a class="toc-link" href="#chuong-4">
+          <span class="toc-no">04</span><span class="toc-title">Một bản báo cáo không phải là một chiếc form</span>
+        </a>
+      </div>
+
+      <div class="toc-group">
+        <p class="toc-group-title">Người xây hệ thống</p>
+        <a class="toc-link" href="#chuong-5">
+          <span class="toc-no">05</span><span class="toc-title">Tôi đang sắp xếp hệ thống, còn ai sắp xếp tôi?</span>
+        </a>
+        <a class="toc-link" href="#chuong-6">
+          <span class="toc-no">06</span><span class="toc-title">Phiên bản thứ mười sáu</span>
+        </a>
+      </div>
+
+      <div class="toc-group">
+        <p class="toc-group-title">Sắp viết</p>
+        <div class="toc-link">
+          <span class="toc-no">··</span><span class="toc-title">Những chương tiếp theo sẽ được mở dần</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main" id="noi-dung">
+      <section class="book-hero" id="bia" aria-labelledby="book-title">
+        <div class="hero-inner">
+          <div class="hero-kicker">Vie Trần · Tự sự nghề nghiệp</div>
+          <h1 class="hero-title" id="book-title">LA-CONNECT<span>.</span></h1>
+          <p class="hero-subtitle">Khởi nguồn cùng AI — hành trình một Loss Adjuster học cách biến kinh nghiệm thành những hệ thống phục vụ con người.</p>
+          <div class="hero-declaration">
+            Tool có thể lỗi thời. Khả năng tư duy, học hỏi và chịu trách nhiệm của con người thì không được phép lỗi thời.
+          </div>
+          <div class="hero-meta" aria-label="Thông tin sách">
+            <span class="meta-pill">Bản đọc thử UI · v1</span>
+            <span class="meta-pill">06 chương đã duyệt</span>
+            <span class="meta-pill">Single-file HTML</span>
+            <span class="meta-pill">Human-centered AI</span>
+          </div>
+        </div>
+      </section>
+
+      <article class="reader-stage" id="chuong-1">
+        <header class="chapter-opener">
+          <div class="chapter-number">Chương 01 · Khởi nguồn</div>
+          <h2 class="chapter-title">Hôm qua còn chạy tốt</h2>
+          <p class="chapter-lead">Một cảnh tổng hợp từ ký ức của cả giai đoạn đầu—không phải một sự kiện có timestamp chính xác.</p>
+        </header>
+
+        <div class="prose">
+          <p>Tôi không còn nhớ chính xác đó là <code>appendix</code> hay <code>report-vetting</code>.</p>
+
+          <p>Tôi chỉ nhớ trước màn hình là một thư mục có rất nhiều file. Hôm trước, Agent đã đọc skill, phân loại tài liệu và đặt lại tên file theo hệ thống Phụ lục của báo cáo giám định. Kết quả đủ tốt để tôi tin rằng mình đang đi đúng hướng.</p>
+
+          <p>Hôm sau, cũng người đồng nghiệp ấy dường như không còn nhớ mình đã được dạy những gì.</p>
+
+          <blockquote><strong>Hôm qua còn chạy tốt. Tại sao hôm nay lại như chưa từng được dạy?</strong></blockquote>
+
+          <h2>Một hệ thống không bắt đầu từ công nghệ</h2>
+
+          <p>Điều tôi muốn không phải là đưa con người ra khỏi công việc. Tôi muốn những Loss Adjuster trẻ bớt thời gian cho phần việc lặp lại để có thêm thời gian học cách nhìn, cách phán đoán và cách chịu trách nhiệm.</p>
+
+          <div class="callout callout-human">
+            <div class="callout-label">Con người ở trung tâm</div>
+            <strong>AI nhận lấy phần việc lặp lại để con người có thể hiện diện ở nơi quan trọng nhất: phán đoán, hướng dẫn và chịu trách nhiệm.</strong>
+          </div>
+
+          <p>Những skill đầu tiên đã cho tôi thấy một khả năng rất thật. Nhưng chúng cũng mở ra một nỗi đau rất quen thuộc với những ai từng làm việc lâu cùng AI: điều vừa chạy đúng chưa chắc sẽ tiếp tục chạy đúng vào ngày mai.</p>
+
+          <p><mark>Tôi đang học để xây dựng tất cả các hệ thống phục vụ cho con người.</mark></p>
+
+          <div class="callout">
+            <div class="callout-label">Điểm ngoặt</div>
+            Khi hành vi của Agent bắt đầu thiếu ổn định, câu hỏi không còn là “AI có làm được không?”. Câu hỏi trở thành: “Làm sao giữ cho hệ thống không quên những gì vừa được dạy?”
+          </div>
+
+          <p class="frame-note">Bản KHUNG: nội dung hiện chỉ dùng để duyệt bố cục và cảm giác thị giác. Các nút, tìm kiếm, chuyển chương và ghi nhớ tiến trình chưa hoạt động ở Giai đoạn 1.</p>
+        </div>
+
+        <nav class="pager" aria-label="Điều hướng chương">
+          <div class="pager-card">
+            <span class="pager-dir">Trang trước</span>
+            <span class="pager-title">Bìa sách</span>
+          </div>
+          <div class="pager-card next">
+            <span class="pager-dir">Chương tiếp theo</span>
+            <span class="pager-title">Với AI Agent, chỉ SKILL thì không đủ</span>
+          </div>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

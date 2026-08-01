@@ -10,10 +10,11 @@ https://vie01279-byte.github.io/library/
 
 ---
 
-## Categories (Tổng cộng: 9)
+## Categories (Tổng cộng: 10)
 
-### 📖 Books (7)
+### 📖 Books (8)
 
+- LA-CONNECT — Bản khung thử nghiệm
 - Nghệ thuật sống cùng xác suất
 - 50 Ý Tưởng Cho Một File HTML
 - Commanding AI · Ra Lệnh Cho AI
