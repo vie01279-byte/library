@@ -1,16 +1,17 @@
 [
   {
-    "title": "LA-CONNECT — Bản đọc thử nghiệm",
+    "title": "LA-CONNECT — Khởi nguồn cùng AI",
     "author": "Vie Tran",
-    "version": "4.2-danhbong",
-    "updated": "2026-08-01",
+    "version": "5.0-preview-full-book",
+    "updated": "2026-08-04",
     "language": "vi",
     "category": "Agentic AI",
     "type": "book",
     "tags": ["Agentic AI", "Loss Adjusting", "Human-centered Systems"],
     "cover": "assets/covers/default-book.png",
     "url": "books/la-connect.html",
-    "description": "Bản đọc tương tác của LA-CONNECT với sáu chương đã duyệt."
+    "description": "Bản đọc thử tương tác toàn bộ LA-CONNECT, gồm Lời Mở Đầu và 12 chương đã tổng duyệt.",
+    "id": "la-connect"
   },
   {
     "title": "Nghệ thuật sống cùng xác suất",
