@@ -2,15 +2,15 @@
   {
     "title": "LA-CONNECT — Khởi nguồn cùng AI",
     "author": "Vie Tran",
-    "version": "5.0-preview-full-book",
-    "updated": "2026-08-04",
+    "version": "5.0",
+    "updated": "2026-08-05",
     "language": "vi",
     "category": "Agentic AI",
     "type": "book",
     "tags": ["Agentic AI", "Loss Adjusting", "Human-centered Systems"],
     "cover": "assets/covers/default-book.png",
     "url": "books/la-connect.html",
-    "description": "Bản đọc thử tương tác toàn bộ LA-CONNECT, gồm Lời Mở Đầu và 12 chương đã tổng duyệt.",
+    "description": "Quyển sách hoàn chỉnh LA-CONNECT, gồm Lời Mở Đầu và 12 chương về hành trình làm việc cùng Agentic AI, chuyển giao hệ thống và học cách sống.",
     "id": "la-connect"
   },
   {
