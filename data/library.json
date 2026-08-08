@@ -1,16 +1,21 @@
 [
   {
-    "title": "LA-CONNECT — Khởi nguồn cùng AI",
+    "title": "LA-CONNECT — A Loss Adjuster's Journey with AI",
     "author": "Vie Tran",
-    "version": "5.2.1",
-    "updated": "2026-08-05",
-    "language": "vi",
+    "version": "5.3-preview",
+    "updated": "2026-08-08",
+    "language": "vi/en",
     "category": "Agentic AI",
     "type": "book",
-    "tags": ["Agentic AI", "Loss Adjusting", "Human-centered Systems"],
+    "tags": [
+      "Agentic AI",
+      "Loss Adjusting",
+      "Human-centered Systems",
+      "Bilingual"
+    ],
     "cover": "assets/covers/default-book.png",
     "url": "books/la-connect.html",
-    "description": "Quyển sách hoàn chỉnh LA-CONNECT, gồm Lời Mở Đầu, 12 chương và Phụ lục tổng quan AnG_InS_Pro về hành trình làm việc cùng Agentic AI, chuyển giao hệ thống và học cách sống.",
+    "description": "Bản đọc thử song ngữ VI/EN của LA-CONNECT, gồm Lời Mở Đầu, 12 chương và Phụ lục tổng quan AnG_InS_Pro; bản tiếng Anh CH-01–CH-09 sẽ tiếp tục được native-English recast.",
     "id": "la-connect"
   },
   {
@@ -21,7 +26,11 @@
     "language": "vi",
     "category": "Trading",
     "type": "book",
-    "tags": ["Trading", "Psychology", "Probability"],
+    "tags": [
+      "Trading",
+      "Psychology",
+      "Probability"
+    ],
     "cover": "assets/covers/default-book.png",
     "url": "books/Nghe-Thuat-Song-Cung-Xac-Suat.html",
     "description": "Triết lý Prop Trading và áp dụng xác suất vào đời sống."
@@ -34,7 +43,11 @@
     "language": "vi",
     "category": "Technology",
     "type": "book",
-    "tags": ["HTML", "Web", "Course"],
+    "tags": [
+      "HTML",
+      "Web",
+      "Course"
+    ],
     "cover": "assets/covers/default-book.png",
     "url": "books/50-y-tuong-cho-mot-file-html.html",
     "description": "Khóa học song ngữ về 50 ý tưởng xây dựng ứng dụng HTML."
@@ -47,7 +60,11 @@
     "language": "vi",
     "category": "Astrology",
     "type": "app",
-    "tags": ["Bazi", "Tool", "Astrology"],
+    "tags": [
+      "Bazi",
+      "Tool",
+      "Astrology"
+    ],
     "cover": "assets/covers/default-app.png",
     "url": "apps/bat-tu-v2.html",
     "description": "Sách tra lá số bát tự tương tác."
@@ -60,7 +77,10 @@
     "language": "vi",
     "category": "Technology",
     "type": "book",
-    "tags": ["AI", "Prompt Engineering"],
+    "tags": [
+      "AI",
+      "Prompt Engineering"
+    ],
     "cover": "assets/covers/default-book.png",
     "url": "books/commanding-ai.html",
     "description": "Hướng dẫn cách ra lệnh và làm việc với AI hiệu quả."
@@ -73,7 +93,11 @@
     "language": "vi",
     "category": "Technology",
     "type": "book",
-    "tags": ["AI", "Claude", "Workspace"],
+    "tags": [
+      "AI",
+      "Claude",
+      "Workspace"
+    ],
     "cover": "assets/covers/default-book.png",
     "url": "books/huong-dan-claude-cowork.html",
     "description": "Tài liệu hướng dẫn sử dụng Claude trong Workspace."
@@ -86,7 +110,11 @@
     "language": "vi",
     "category": "Tools",
     "type": "app",
-    "tags": ["Legal", "Contract", "Tool"],
+    "tags": [
+      "Legal",
+      "Contract",
+      "Tool"
+    ],
     "cover": "assets/covers/default-app.png",
     "url": "apps/tro-ly-soan-hop-dong.html",
     "description": "Công cụ hỗ trợ tự động soạn thảo hợp đồng."
@@ -99,7 +127,11 @@
     "language": "en",
     "category": "Technology",
     "type": "book",
-    "tags": ["AI", "Workshop", "Bilingual"],
+    "tags": [
+      "AI",
+      "Workshop",
+      "Bilingual"
+    ],
     "cover": "assets/covers/default-book.png",
     "url": "books/workshop-ai-as-tool.html",
     "description": "Bilingual Coaching Guide for using AI as a tool."
@@ -112,7 +144,11 @@
     "language": "vi",
     "category": "Technology",
     "type": "book",
-    "tags": ["AI", "Management", "Leadership"],
+    "tags": [
+      "AI",
+      "Management",
+      "Leadership"
+    ],
     "cover": "assets/covers/default-book.png",
     "url": "books/lam-ceo-cua-doi-ngu-ai.html",
     "description": "Kỹ năng quản trị và điều phối đội ngũ AI."
@@ -125,7 +161,11 @@
     "language": "vi",
     "category": "Writing",
     "type": "book",
-    "tags": ["Writing", "Communication", "Content"],
+    "tags": [
+      "Writing",
+      "Communication",
+      "Content"
+    ],
     "cover": "assets/covers/default-book.png",
     "url": "books/viet-cho-nguoi-writing-for-humans.html",
     "description": "Cẩm nang kỹ năng viết hướng tới độc giả con người."
