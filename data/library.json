@@ -2,7 +2,7 @@
   {
     "title": "LA-CONNECT — A Loss Adjuster's Journey with AI",
     "author": "Vie Tran",
-    "version": "5.3.2-preview",
+    "version": "5.3.3-preview",
     "updated": "2026-08-08",
     "language": "vi/en",
     "category": "Agentic AI",
@@ -15,7 +15,7 @@
     ],
     "cover": "assets/covers/default-book.png",
     "url": "books/la-connect.html",
-    "description": "Bản đọc thử song ngữ VI/EN của LA-CONNECT; v5.3.2 chuyển các câu nhấn mạnh đã chọn từ blockquote sang chữ đậm thông thường và giữ tối ưu thanh công cụ iPhone.",
+    "description": "Bản đọc thử song ngữ VI/EN của LA-CONNECT; v5.3.3 hiệu chỉnh đoạn CH-05 về cách Vie cấu trúc một hồ sơ giám định phức tạp, đồng thời giữ các hotfix giao diện trước đó.",
     "id": "la-connect"
   },
   {
