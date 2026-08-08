@@ -699,7 +699,7 @@
       document.querySelectorAll('.toc-link').forEach(link => { const chapter = chapters.find(item => `#${item.slug}` === link.getAttribute('href')); if (chapter) link.querySelector('.toc-title').textContent = chapter.title; });
       const groupNames = currentLanguage === 'en' ? ['Preface', 'Part I · Vie learns to build with Agentic AI', 'Part II · Vie considers how to hand it over', 'Part III · And Vie is also learning how to live', 'Appendix'] : ['Mở đầu', 'Phần I · Vie học cách xây Agentic-AI', 'Phần II · Vie nghĩ về cách chuyển giao', 'Phần III · Và Vie cũng đang học cách sống', 'Phụ lục'];
       document.querySelectorAll('.toc-group-title').forEach((node, index) => { node.textContent = groupNames[index]; });
-      const FONT_SIZES = [17, 18.4, 20, 22];
+      const FONT_SIZES = [17, 18.4, 20, 22, 24, 26];
       const defaults = { chapter: 'loi-mo-dau', theme: 'light', fontSize: 18.4, focus: false };
       function sanitizeSettings(value = {}) {
         return {
