@@ -2,8 +2,8 @@
   {
     "title": "LA-CONNECT",
     "author": "Vie Tran",
-    "version": "5.6",
-    "updated": "2026-08-08",
+    "version": "6.0",
+    "updated": "2026-08-19",
     "language": "vi/en",
     "category": "Agentic AI",
     "type": "book",
@@ -15,7 +15,7 @@
     ],
     "cover": "assets/covers/default-book.png",
     "url": "books/la-connect.html",
-    "description": "Ấn bản song ngữ final v5.6 của LA-CONNECT, gồm Lời Mở Đầu, 12 chương và Phụ lục về LA-P — Loss Adjusting Protocol.",
+    "description": "Ấn bản song ngữ v6 của LA-CONNECT, gồm Lời Mở Đầu và 12 chương được biên tập lại; giữ nguyên Phụ lục LA-P từ bản v5.6.",
     "id": "la-connect"
   },
   {
