@@ -2,8 +2,8 @@
   {
     "title": "LA-CONNECT",
     "author": "Vie Tran",
-    "version": "6.0.1",
-    "updated": "2026-08-20",
+    "version": "6.1",
+    "updated": "2026-08-24",
     "language": "vi/en",
     "category": "Agentic AI",
     "type": "book",
@@ -15,7 +15,7 @@
     ],
     "cover": "assets/covers/default-book.png",
     "url": "books/la-connect.html",
-    "description": "Ấn bản song ngữ v6.0.1 của LA-CONNECT, bổ sung liên kết nhảy nhanh tới 12 chương trong Lời Mở Đầu; giữ nguyên Phụ lục LA-P từ bản v5.6.",
+    "description": "Ấn bản song ngữ v6.1 của LA-CONNECT, khôi phục giọng kể gần gũi và chiều sâu nghề nghiệp trong Lời Mở Đầu; giữ nguyên 12 chương và Phụ lục LA-P.",
     "id": "la-connect"
   },
   {
