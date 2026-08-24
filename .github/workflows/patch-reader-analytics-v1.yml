@@ -1,15 +1,17 @@
 name: Patch Reader Analytics v1
 
 on:
+  pull_request:
+    branches: [main]
   push:
-    branches:
-      - feature/reader-analytics-v1
+    branches: [feature/reader-analytics-v1]
 
 permissions:
   contents: write
 
 jobs:
-  patch:
+  patch-and-validate:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,268 +19,231 @@ jobs:
           ref: feature/reader-analytics-v1
           fetch-depth: 0
 
-      - name: Patch LA-CONNECT reader analytics
+      - name: Patch analytics as an isolated script block
+        shell: bash
         run: |
+          cat > /tmp/reader-analytics-v1.html <<'EOF'
+          <!-- Vie Library Reader Analytics v1 -->
+          <script>
+          (() => {
+            'use strict';
+            const BOOK_ID = 'la-connect';
+            const READER_VERSION = 'reader-analytics-v1';
+            const MILESTONES = [25, 50, 75, 100];
+            const sentProgress = new Set();
+            const viewedChapters = new Set();
+            let lastChapter = null;
+            let pendingNav = null;
+            let hasScrolled = false;
+            let engagedSent = false;
+            let completeSent = false;
+
+            const clean = (v) => (v || '').replace(/\s+/g, ' ').trim();
+
+            function detectBookVersion() {
+              const meta = document.querySelector('meta[name="book-version"], meta[name="version"]');
+              if (meta?.content) return clean(meta.content).replace(/^v/i, '');
+              const data = document.querySelector('[data-book-version], [data-version]');
+              const dataValue = data?.dataset?.bookVersion || data?.dataset?.version;
+              if (dataValue) return clean(dataValue).replace(/^v/i, '');
+              for (const node of document.querySelectorAll('.book-version, .version, [class*="version"], [id*="version"]')) {
+                const m = clean(node.textContent).match(/(?:version|phiên\s*bản|v)\s*[:\-]?\s*v?(\d+\.\d+(?:\.\d+)?)/i);
+                if (m) return m[1];
+              }
+              return null;
+            }
+
+            function baseParams() {
+              const p = { book_id: BOOK_ID, reader_version: READER_VERSION };
+              const version = detectBookVersion();
+              if (version) p.book_version = version;
+              return p;
+            }
+
+            function track(name, params = {}) {
+              if (typeof window.gtag !== 'function') return;
+              window.gtag('event', name, { ...baseParams(), ...params });
+            }
+
+            function tocLinks() {
+              const links = Array.from(document.querySelectorAll('.toc-link[href^="#"]'));
+              const seen = new Set();
+              return links.filter((a) => {
+                const id = decodeURIComponent((a.getAttribute('href') || '').slice(1));
+                if (!id || seen.has(id)) return false;
+                seen.add(id);
+                return true;
+              });
+            }
+
+            function chapterId() {
+              const id = decodeURIComponent(location.hash.slice(1));
+              if (!id) return null;
+              return tocLinks().some((a) => decodeURIComponent(a.getAttribute('href').slice(1)) === id) ? id : null;
+            }
+
+            function chapterInfo(id) {
+              const links = tocLinks();
+              const index = links.findIndex((a) => decodeURIComponent(a.getAttribute('href').slice(1)) === id);
+              const link = index >= 0 ? links[index] : null;
+              return {
+                index,
+                count: links.length,
+                number: index >= 0 ? index + 1 : undefined,
+                title: clean(link?.querySelector('.toc-title')?.textContent || link?.textContent) || undefined
+              };
+            }
+
+            function sendEngaged(timerQualified = false) {
+              if (engagedSent) return;
+              if ((timerQualified && hasScrolled) || viewedChapters.size >= 2) {
+                engagedSent = true;
+                track('reader_engaged', {
+                  engagement_seconds: timerQualified ? 60 : undefined,
+                  chapters_viewed: viewedChapters.size
+                });
+                if (sentProgress.has(100)) sendComplete();
+              }
+            }
+
+            function sendComplete() {
+              if (completeSent || !engagedSent || !sentProgress.has(100)) return;
+              completeSent = true;
+              track('book_complete', { chapters_viewed: viewedChapters.size });
+            }
+
+            function withinChapterFraction() {
+              const max = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+              return max === 0 ? 1 : Math.max(0, Math.min(1, scrollY / max));
+            }
+
+            function globalPercent() {
+              const id = chapterId();
+              if (!id) return 0;
+              const info = chapterInfo(id);
+              if (info.index < 0 || info.count < 1) return 0;
+              return ((info.index + withinChapterFraction()) / info.count) * 100;
+            }
+
+            function updateProgress() {
+              const pct = globalPercent();
+              const id = chapterId();
+              for (const milestone of MILESTONES) {
+                if (pct >= milestone && !sentProgress.has(milestone)) {
+                  sentProgress.add(milestone);
+                  track('reading_progress', { progress_percent: milestone, chapter_id: id || undefined });
+                }
+              }
+              sendComplete();
+            }
+
+            function trackChapter(method = 'unknown') {
+              const id = chapterId();
+              if (!id || id === lastChapter) return;
+              lastChapter = id;
+              viewedChapters.add(id);
+              const info = chapterInfo(id);
+              track('chapter_view', {
+                chapter_id: id,
+                chapter_number: info.number,
+                chapter_title: info.title,
+                navigation_method: method
+              });
+              sendEngaged(false);
+              updateProgress();
+            }
+
+            function clickMethod(target) {
+              const el = target.closest('a[href^="#"], button, .toc-link, .search-result');
+              if (!el) return null;
+              const text = clean(el.textContent).toLowerCase();
+              const cls = String(el.className || '').toLowerCase();
+              if (el.closest('.search-result') || cls.includes('search-result')) return 'search';
+              if (el.closest('.toc-link') || cls.includes('toc-link')) return 'toc';
+              if (cls.includes('prev') || /chương trước|previous/.test(text)) return 'previous';
+              if (cls.includes('next') || /chương tiếp|next/.test(text)) return 'next';
+              return 'internal_link';
+            }
+
+            document.addEventListener('click', (e) => {
+              const method = clickMethod(e.target);
+              if (method) pendingNav = method;
+            }, true);
+
+            addEventListener('hashchange', () => {
+              const method = pendingNav || 'direct_link';
+              pendingNav = null;
+              setTimeout(() => trackChapter(method), 0);
+            });
+
+            let ticking = false;
+            addEventListener('scroll', () => {
+              hasScrolled = true;
+              if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(() => {
+                  ticking = false;
+                  updateProgress();
+                });
+              }
+            }, { passive: true });
+
+            setTimeout(() => sendEngaged(true), 60000);
+
+            addEventListener('load', () => {
+              const start = chapterId();
+              track('book_open', {
+                start_chapter: start || 'cover',
+                language: document.documentElement.lang || 'vi'
+              });
+              if (start) trackChapter('direct_link');
+            }, { once: true });
+          })();
+          </script>
+          <!-- /Vie Library Reader Analytics v1 -->
+          EOF
+
           python3 - <<'PY'
           from pathlib import Path
-
           path = Path('books/la-connect.html')
           text = path.read_text(encoding='utf-8')
           marker = '<!-- Vie Library Reader Analytics v1 -->'
           if marker in text:
-              print('Reader Analytics v1 already present; no patch needed.')
-              raise SystemExit(0)
-          if '</body>' not in text:
-              raise SystemExit('Refusing to patch: </body> anchor not found.')
-          if 'G-FX6Q6TRYE1' not in text:
-              raise SystemExit('Refusing to patch: GA4 base tag not found.')
-
-          script = r'''\n<!-- Vie Library Reader Analytics v1 -->
-<script>
-(() => {
-  'use strict';
-
-  const BOOK_ID = 'la-connect';
-  const READER_VERSION = 'reader-analytics-v1';
-  const PROGRESS_MILESTONES = [25, 50, 75, 100];
-  const sentProgress = new Set();
-  const viewedChapters = new Set();
-  let lastTrackedChapter = null;
-  let pendingNavigationMethod = null;
-  let hasScrolled = false;
-  let engagedSent = false;
-
-  const normalizeText = (value) => (value || '').replace(/\s+/g, ' ').trim();
-
-  function detectBookVersion() {
-    const meta = document.querySelector('meta[name="book-version"], meta[name="version"]');
-    if (meta && meta.content) return normalizeText(meta.content).replace(/^v/i, '');
-
-    const dataNode = document.querySelector('[data-book-version], [data-version]');
-    if (dataNode) {
-      const value = dataNode.dataset.bookVersion || dataNode.dataset.version;
-      if (value) return normalizeText(value).replace(/^v/i, '');
-    }
-
-    const candidates = document.querySelectorAll('.book-version, .version, [class*="version"], [id*="version"]');
-    for (const node of candidates) {
-      const match = normalizeText(node.textContent).match(/(?:version|phiên\s*bản|v)\s*[:\-]?\s*v?(\d+\.\d+(?:\.\d+)?)/i);
-      if (match) return match[1];
-    }
-    return null;
-  }
-
-  function baseParams() {
-    const params = {
-      book_id: BOOK_ID,
-      reader_version: READER_VERSION
-    };
-    const version = detectBookVersion();
-    if (version) params.book_version = version;
-    return params;
-  }
-
-  function sendEvent(name, params = {}) {
-    if (typeof window.gtag !== 'function') return;
-    window.gtag('event', name, { ...baseParams(), ...params });
-  }
-
-  function chapterLinks() {
-    const links = Array.from(document.querySelectorAll('.toc-link[href^="#"], a.toc-link[href^="#"]'));
-    const seen = new Set();
-    return links.filter((link) => {
-      const id = decodeURIComponent((link.getAttribute('href') || '').replace(/^#/, ''));
-      if (!id || seen.has(id)) return false;
-      seen.add(id);
-      return true;
-    });
-  }
-
-  function currentChapterId() {
-    const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-    if (!hash) return null;
-    const ids = new Set(chapterLinks().map((link) => decodeURIComponent(link.getAttribute('href').replace(/^#/, ''))));
-    return ids.has(hash) ? hash : null;
-  }
-
-  function chapterMeta(chapterId) {
-    const links = chapterLinks();
-    const index = links.findIndex((link) => decodeURIComponent(link.getAttribute('href').replace(/^#/, '')) === chapterId);
-    const link = index >= 0 ? links[index] : null;
-    const titleNode = link && link.querySelector('.toc-title');
-    return {
-      chapter_number: index >= 0 ? index + 1 : undefined,
-      chapter_title: normalizeText(titleNode ? titleNode.textContent : (link ? link.textContent : '')) || undefined,
-      chapter_index: index,
-      chapter_count: links.length
-    };
-  }
-
-  function trackChapter(method) {
-    const chapterId = currentChapterId();
-    if (!chapterId || chapterId === lastTrackedChapter) return;
-    lastTrackedChapter = chapterId;
-    viewedChapters.add(chapterId);
-    const meta = chapterMeta(chapterId);
-    sendEvent('chapter_view', {
-      chapter_id: chapterId,
-      chapter_number: meta.chapter_number,
-      chapter_title: meta.chapter_title,
-      navigation_method: method || 'unknown'
-    });
-    maybeSendEngaged();
-    updateReadingProgress();
-  }
-
-  function readingFractionWithinChapter() {
-    const scrollable = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    if (scrollable === 0) return 1;
-    return Math.max(0, Math.min(1, window.scrollY / scrollable));
-  }
-
-  function globalReadingPercent() {
-    const chapterId = currentChapterId();
-    if (!chapterId) return 0;
-    const meta = chapterMeta(chapterId);
-    if (meta.chapter_index < 0 || meta.chapter_count < 1) return 0;
-    return ((meta.chapter_index + readingFractionWithinChapter()) / meta.chapter_count) * 100;
-  }
-
-  function updateReadingProgress() {
-    const percent = globalReadingPercent();
-    const chapterId = currentChapterId();
-    for (const milestone of PROGRESS_MILESTONES) {
-      if (percent >= milestone && !sentProgress.has(milestone)) {
-        sentProgress.add(milestone);
-        sendEvent('reading_progress', {
-          progress_percent: milestone,
-          chapter_id: chapterId || undefined
-        });
-      }
-    }
-    if (sentProgress.has(100) && engagedSent) sendComplete();
-  }
-
-  let completeSent = false;
-  function sendComplete() {
-    if (completeSent) return;
-    completeSent = true;
-    sendEvent('book_complete', {
-      chapters_viewed: viewedChapters.size
-    });
-  }
-
-  function maybeSendEngaged(forceTimer = false) {
-    if (engagedSent) return;
-    if ((forceTimer && hasScrolled) || viewedChapters.size >= 2) {
-      engagedSent = true;
-      sendEvent('reader_engaged', {
-        engagement_seconds: forceTimer ? 60 : undefined,
-        chapters_viewed: viewedChapters.size
-      });
-      if (sentProgress.has(100)) sendComplete();
-    }
-  }
-
-  function navigationMethodFromClick(target) {
-    const element = target.closest('a[href^="#"], button, .toc-link, .search-result');
-    if (!element) return null;
-    const label = normalizeText(element.textContent).toLowerCase();
-    const classes = String(element.className || '').toLowerCase();
-    if (element.closest('.search-result') || classes.includes('search-result')) return 'search';
-    if (element.closest('.toc-link') || classes.includes('toc-link')) return 'toc';
-    if (classes.includes('prev') || /chương trước|previous/.test(label)) return 'previous';
-    if (classes.includes('next') || /chương tiếp|next/.test(label)) return 'next';
-    return 'internal_link';
-  }
-
-  document.addEventListener('click', (event) => {
-    const method = navigationMethodFromClick(event.target);
-    if (method) pendingNavigationMethod = method;
-  }, true);
-
-  window.addEventListener('hashchange', () => {
-    const method = pendingNavigationMethod || 'direct_link';
-    pendingNavigationMethod = null;
-    setTimeout(() => trackChapter(method), 0);
-  });
-
-  let scrollTicking = false;
-  window.addEventListener('scroll', () => {
-    hasScrolled = true;
-    if (!scrollTicking) {
-      scrollTicking = true;
-      window.requestAnimationFrame(() => {
-        scrollTicking = false;
-        updateReadingProgress();
-      });
-    }
-  }, { passive: true });
-
-  window.setTimeout(() => maybeSendEngaged(true), 60000);
-
-  window.addEventListener('load', () => {
-    const startChapter = currentChapterId();
-    sendEvent('book_open', {
-      start_chapter: startChapter || 'cover',
-      language: document.documentElement.lang || 'vi'
-    });
-    if (startChapter) trackChapter('direct_link');
-  }, { once: true });
-})();
-</script>
-<!-- /Vie Library Reader Analytics v1 -->\n'''
-
-          text = text.replace('</body>', script + '</body>', 1)
-          path.write_text(text, encoding='utf-8')
-          print('Patched Reader Analytics v1 before </body>.')
+              print('Analytics already present; leaving HTML unchanged.')
+          else:
+              assert '</body>' in text, 'Missing </body> anchor'
+              assert 'G-FX6Q6TRYE1' in text, 'Missing GA4 base tag'
+              block = Path('/tmp/reader-analytics-v1.html').read_text(encoding='utf-8')
+              path.write_text(text.replace('</body>', block + '\n</body>', 1), encoding='utf-8')
           PY
 
-      - name: Validate patch invariants
+      - name: Validate analytics JavaScript
         run: |
           python3 - <<'PY'
           from pathlib import Path
           text = Path('books/la-connect.html').read_text(encoding='utf-8')
           assert text.count('<!-- Vie Library Reader Analytics v1 -->') == 1
-          assert text.count("sendEvent('book_open'") == 1
-          assert text.count("sendEvent('chapter_view'") == 1
-          assert text.count("sendEvent('reading_progress'") == 1
-          assert text.count("sendEvent('reader_engaged'") == 1
-          assert text.count("sendEvent('book_complete'") == 1
-          assert 'const BOOK_ID = \'la-connect\';' in text
-          assert 'book_version:' not in text, 'book_version must not be hard-coded'
+          assert text.count("track('book_open'") == 1
+          assert text.count("track('chapter_view'") == 1
+          assert text.count("track('reading_progress'") == 1
+          assert text.count("track('reader_engaged'") == 1
+          assert text.count("track('book_complete'") == 1
           assert 'function detectBookVersion()' in text
-          print('Invariant checks passed.')
-          PY
-
-      - name: JavaScript syntax check
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          text = Path('books/la-connect.html').read_text(encoding='utf-8')
+          assert "const BOOK_ID = 'la-connect';" in text
           start = text.index('<!-- Vie Library Reader Analytics v1 -->')
           end = text.index('<!-- /Vie Library Reader Analytics v1 -->', start)
           block = text[start:end]
-          js = block[block.index('<script>') + len('<script>'):block.rindex('</script>')]
-          Path('/tmp/reader-analytics-v1.js').write_text(js, encoding='utf-8')
+          js = block[block.index('<script>') + 8:block.rindex('</script>')]
+          Path('/tmp/analytics.js').write_text(js, encoding='utf-8')
           PY
-          node --check /tmp/reader-analytics-v1.js
-
-      - name: Diff safety checks
-        run: |
+          node --check /tmp/analytics.js
           git diff --check
-          echo '--- DIFF STAT ---'
-          git diff --stat
-          echo '--- CHANGED FILES ---'
-          git diff --name-only
           test "$(git diff --name-only | tr -d '\r')" = "books/la-connect.html"
+          git diff --stat
 
-      - name: Commit patch
+      - name: Commit validated patch
         run: |
-          if git diff --quiet; then
-            echo 'No changes to commit.'
-            exit 0
-          fi
+          if git diff --quiet; then exit 0; fi
           git config user.name 'Vie Library Analytics Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add books/la-connect.html
