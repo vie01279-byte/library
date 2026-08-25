@@ -1,0 +1,55 @@
+name: GA4 dual-tag safety patch
+
+on:
+  push:
+    branches:
+      - test/ga4-dual-tag-safety
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test/ga4-dual-tag-safety
+          fetch-depth: 0
+
+      - name: Patch only GA4 config block
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('books/la-connect.html')
+          s = p.read_text(encoding='utf-8')
+          old = "    gtag('config', 'G-FX6Q6TRYE1');\n"
+          new_id = "G-LRTX5J7WJ3"
+          new = old + f"    gtag('config', '{new_id}'); // TEST stream — temporary dual-tag\n"
+          if s.count(old) != 1:
+              raise SystemExit(f'Expected exactly one primary GA4 config, found {s.count(old)}')
+          if new_id in s:
+              raise SystemExit('TEST Measurement ID already exists; refusing duplicate patch')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Verify exact diff scope
+        shell: bash
+        run: |
+          git diff --check
+          test "$(git diff --name-only | wc -l | tr -d ' ')" = "1"
+          test "$(git diff --name-only)" = "books/la-connect.html"
+          test "$(git diff --numstat books/la-connect.html | awk '{print $1}')" = "1"
+          test "$(git diff --numstat books/la-connect.html | awk '{print $2}')" = "0"
+          git diff -- books/la-connect.html
+
+      - name: Commit safety patch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add books/la-connect.html
+          git commit -m "test: add secondary GA4 stream for A/B diagnostics"
+          git push origin HEAD:test/ga4-dual-tag-safety
