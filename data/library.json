@@ -2,8 +2,8 @@
   {
     "title": "LA-CONNECT",
     "author": "Vie Tran",
-    "version": "6.1",
-    "updated": "2026-08-24",
+    "version": "6.2",
+    "updated": "2026-09-06",
     "language": "vi/en",
     "category": "Agentic AI",
     "type": "book",
@@ -15,7 +15,7 @@
     ],
     "cover": "assets/covers/default-book.png",
     "url": "books/la-connect.html",
-    "description": "Ấn bản song ngữ v6.1 của LA-CONNECT, hiệu đính giọng kể gần gũi và chiều sâu nghề nghiệp từ Lời Mở Đầu đến Chương 10; giữ nguyên Chương 11, Chương 12 và Phụ lục LA-P.",
+    "description": "Ấn bản song ngữ v6.2 của LA-CONNECT; bổ sung Phụ lục 2 — Từ LA-P đến LA-Page, ghi lại bước chuyển từ LA-P sang một ứng dụng web độc lập và những bài học Developer rút ra từ hành trình xây dựng cùng AI Agent.",
     "id": "la-connect"
   },
   {
